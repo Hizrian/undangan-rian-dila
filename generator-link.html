@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Generator Link & Pesan Undangan</title>
+    <style>
+      :root {
+        --accent: #2f6fa8;
+        --muted: #666;
+        --bg: #f7fafc;
+        --white: #ffffff;
+      }
+      body {
+        font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+        background: var(--bg);
+        margin: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        padding: 24px;
+      }
+      .card {
+        width: 100%;
+        max-width: 700px;
+        background: var(--white);
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: 0 6px 18px rgba(15, 23, 42, 0.06);
+        border: 1px solid rgba(47, 111, 168, 0.08);
+      }
+      h1 {
+        margin: 0 0 8px;
+        font-size: 1.3rem;
+        color: #0b2540;
+      }
+      p.small {
+        margin: 0 0 16px;
+        color: var(--muted);
+        font-size: 0.95rem;
+      }
+      .row {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        margin-bottom: 12px;
+      }
+      input[type="text"] {
+        flex: 1;
+        padding: 10px 12px;
+        border: 1px solid #d1d5db;
+        border-radius: 8px;
+        font-size: 1rem;
+      }
+      button {
+        background: var(--accent);
+        color: white;
+        border: 0;
+        padding: 10px 14px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 600;
+      }
+      button:active {
+        transform: translateY(1px);
+      }
+      .output {
+        margin-top: 16px;
+        padding: 12px;
+        border-radius: 8px;
+        background: #f1f5f9;
+        word-break: break-word;
+      }
+      .link {
+        text-decoration: none;
+        color: var(--accent);
+        font-weight: 600;
+      }
+      .hidden {
+        display: none;
+      }
+      textarea {
+        width: 100%;
+        margin-top: 10px;
+        height: 340px;
+        border-radius: 8px;
+        border: 1px solid #cbd5e1;
+        padding: 10px;
+        font-family: inherit;
+        resize: none;
+        background: #fff;
+      }
+      .small-btn {
+        background: #0b2540;
+        color: #fff;
+        border: 0;
+        padding: 8px 12px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 0.9rem;
+        font-weight: 500;
+        margin-top: 6px;
+      }
+      .hint {
+        font-size: 0.85rem;
+        color: var(--muted);
+        margin-top: 6px;
+      }
+      @media (max-width: 480px) {
+        .row {
+          flex-direction: column;
+          align-items: stretch;
+        }
+        button {
+          width: 100%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="card">
+      <h1>Generator Link & Pesan Undangan</h1>
+      <p class="small">Masukkan nama tamu, sistem akan membuat link dan pesan siap salin.</p>
+
+      <div class="row">
+        <input
+          id="guestName"
+          type="text"
+          placeholder="Contoh: Budi Santoso"
+          aria-label="Nama tamu"
+        />
+        <button id="genBtn" type="button">Buat</button>
+      </div>
+
+      <div id="result" class="hidden">
+        <div class="output">
+          <strong>Link Undangan:</strong><br />
+          <a id="inviteLink" class="link" href="#" target="_blank">—</a><br />
+          <button id="copyLinkBtn" class="small-btn">Salin Link</button>
+        </div>
+
+        <div class="output" style="margin-top: 12px">
+          <strong>Pesan Undangan:</strong>
+          <textarea id="messageText" readonly></textarea>
+          <button id="copyMsgBtn" class="small-btn">Salin Pesan</button>
+        </div>
+      </div>
+
+      <p class="hint">Format link: https://undangan.themekita.com/rian-dila/?to=nama+tamu</p>
+    </main>
+
+    <script>
+      const guestInput = document.getElementById("guestName");
+      const genBtn = document.getElementById("genBtn");
+      const result = document.getElementById("result");
+      const inviteLink = document.getElementById("inviteLink");
+      const copyLinkBtn = document.getElementById("copyLinkBtn");
+      const messageText = document.getElementById("messageText");
+      const copyMsgBtn = document.getElementById("copyMsgBtn");
+
+      const baseURL = "https://undangan.themekita.com/rian-dila/?to=";
+      const mapLink = "https://maps.app.goo.gl/3zGkYmV2b7DdGWC98";
+
+      function encodeName(name) {
+        const cleaned = name.trim().replace(/\s+/g, " ");
+        return encodeURIComponent(cleaned).replace(/%20/g, "+");
+      }
+
+      function buildLink(name) {
+        return baseURL + encodeName(name);
+      }
+
+      function buildMessage(name, link) {
+        return `Bismillahirrahmanirrahim
+*Assalamu'alaikum Wr. Wb*
+
+Yth. *${name}*
+
+Tanpa mengurangi rasa hormat, perkenankan kami mengundang Bapak/Ibu/Saudara/i, teman sekaligus sahabat, untuk menghadiri acara kami.
+
+*Akad Nikah*  
+🗓️ Selasa, 20 Januari 2026  
+📍 Mesjid Keuchik Leumik  
+
+*Resepsi*  
+🗓️ Minggu, 25 Januari 2026  
+📍 YRBI Aceh, jln Mesjid Al Qurban, Lr. Keuchik Syam no 172. Gampong Mibo  
+
+*Berikut link undangan kami untuk info lengkap dari acara bisa kunjungi:*  
+${link}
+
+Kami sangat berharap kehadiran dan doa restu Bapak/Ibu/Saudara/i. Terima kasih atas perhatiannya.
+
+*Link map:*  
+${mapLink}
+
+Wassalamu'alaikum Wr. Wb  
+*Rian & Dila*`;
+      }
+
+      genBtn.addEventListener("click", () => {
+        const name = guestInput.value.trim();
+        if (!name) {
+          alert("Masukkan nama tamu terlebih dahulu.");
+          return;
+        }
+        const link = buildLink(name);
+        const message = buildMessage(name, link);
+
+        inviteLink.href = link;
+        inviteLink.textContent = link;
+        messageText.value = message;
+        result.classList.remove("hidden");
+        copyLinkBtn.focus();
+      });
+
+      // Salin link
+      copyLinkBtn.addEventListener("click", async () => {
+        const text = inviteLink.href;
+        try {
+          await navigator.clipboard.writeText(text);
+          copyLinkBtn.textContent = "Disalin ✓";
+          setTimeout(() => (copyLinkBtn.textContent = "Salin Link"), 1500);
+        } catch {
+          alert("Gagal menyalin link.");
+        }
+      });
+
+      // Salin pesan
+      copyMsgBtn.addEventListener("click", async () => {
+        const text = messageText.value;
+        try {
+          await navigator.clipboard.writeText(text);
+          copyMsgBtn.textContent = "Disalin ✓";
+          setTimeout(() => (copyMsgBtn.textContent = "Salin Pesan"), 1500);
+        } catch {
+          alert("Gagal menyalin pesan.");
+        }
+      });
+
+      // Enter untuk buat otomatis
+      guestInput.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          genBtn.click();
+        }
+      });
+    </script>
+  </body>
+</html>
